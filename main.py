@@ -1,3 +1,4 @@
+import random
 from collections import defaultdict
 
 
@@ -28,16 +29,36 @@ class Graph:
 
 
     def legg_til_filmer(self, key, tittel, rating):
+        self._tt_graph[key]
         self._film_info[key] = (tittel, float(rating))
 
     def antall_noder(self):
         return len(self._nm_graph)
 
     def antall_kanter(self):
-        return sum(map(len, self._nm_graph.items()))
+        return sum(map(lambda x: (n := len(x))*(n-1)/2, self._tt_graph.items()))
 
-    def six_degrees(self, nm_id_1, nm_id_2):
-        pass
+    def komponenter(self):
+        not_visitet = set(self._nm_graph.keys())
+        results = defaultdict(lambda: 0)
+        while not_visitet:
+            queue = set()
+            queue.add(not_visitet.pop())
+            count = 1
+            while queue:
+                skuespiller = queue.pop()
+                for film in self._nm_graph[skuespiller]:
+                    for skuespiller in self._tt_graph[film]:
+                        if skuespiller in not_visitet:
+                            count += 1
+                            not_visitet.remove(skuespiller)
+                            queue.add(skuespiller)
+                results[count] += 1
+        return results
+
+
+
+
 
 
 
@@ -60,6 +81,10 @@ if __name__ == "__main__":
     print(graph.antall_noder())
     print(graph.antall_kanter())
 
+    result = graph.komponenter()
+
+    for key in result:
+        print(f"There are {key} components of size {result[key]}")
 
 
 
