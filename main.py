@@ -21,9 +21,9 @@ class Graph:
         self._film_info = dict()
 
     def legg_til_kanter_nm(self, key: str, name: str, tt_ids: set):
-        filtered = filter(lambda x: x in self._tt_graph, tt_ids)
-        self._nm_graph[key] = self._nm_graph[key].union(filtered)
-        for tt_id in filtered:
+        known = lambda x: x in self._tt_graph
+        self._nm_graph[key] = self._nm_graph[key].union(filter(known, tt_ids))
+        for tt_id in filter(known, tt_ids):
             self._tt_graph[tt_id].add(key)
         self._names[key] = name
 
@@ -36,7 +36,8 @@ class Graph:
         return len(self._nm_graph)
 
     def antall_kanter(self):
-        return sum(map(lambda x: (n := len(x))*(n-1)/2, self._tt_graph.items()))
+        return sum(map(lambda x: (n := len(x))*(n-1)/2, self._nm_graph.items()))
+
 
     def komponenter(self):
         not_visitet = set(self._nm_graph.keys())
@@ -84,7 +85,9 @@ if __name__ == "__main__":
     result = graph.komponenter()
 
     for key in result:
-        print(f"There are {key} components of size {result[key]}")
+        print(f"There are {result[key]} components of size {key}")
+
+    print(sum(result.keys()))
 
 
 
