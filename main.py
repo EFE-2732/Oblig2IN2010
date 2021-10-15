@@ -36,7 +36,8 @@ class Graph:
         return len(self._nm_graph)
 
     def antall_kanter(self):
-        return sum(map(lambda x: (n := len(x))*(n-1)/2, self._nm_graph.items()))
+        return sum(map(lambda x: (n := len(x))*(n-1)/2, self._tt_graph.values()))
+
 
 
     def komponenter(self):
@@ -54,7 +55,7 @@ class Graph:
                             count += 1
                             not_visitet.remove(skuespiller)
                             queue.add(skuespiller)
-                results[count] += 1
+            results[count] += 1
         return results
 
 
@@ -86,8 +87,6 @@ if __name__ == "__main__":
 
     for key in result:
         print(f"There are {result[key]} components of size {key}")
-
-    print(sum(result.keys()))
 
 
 
