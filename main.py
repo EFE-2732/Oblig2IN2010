@@ -1,4 +1,3 @@
-import random
 from collections import defaultdict
 
 
@@ -37,7 +36,6 @@ class Graph:
 
     def antall_kanter(self):
         return sum(map(lambda x: (n := len(x))*(n-1)/2, self._tt_graph.values()))
-
 
 
     def komponenter(self):
