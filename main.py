@@ -41,17 +41,17 @@ class Graph:
         not_visitet = set(self._nm_graph.keys())
         results = defaultdict(lambda: 0)
         while not_visitet:
-            queue = set()
-            queue.add(not_visitet.pop())
+            waiting = set()
+            waiting.add(not_visitet.pop())
             count = 1
-            while queue:
-                skuespiller = queue.pop()
+            while waiting:
+                skuespiller = waiting.pop()
                 for film in self._nm_graph[skuespiller]:
                     for nabo in self._tt_graph[film]:
                         if nabo in not_visitet:
                             count += 1
                             not_visitet.discard(nabo)
-                            queue.add(nabo)
+                            waiting.add(nabo)
             results[count] += 1
         return results
 
@@ -84,9 +84,4 @@ if __name__ == "__main__":
 
     for key in result:
         print(f"There are {result[key]} components of size {key}")
-
-    summ = 0
-    for key in result:
-        summ  += key*result[key]
-    print(summ)
 
