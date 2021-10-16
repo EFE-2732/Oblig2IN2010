@@ -8,7 +8,7 @@ class Graph:
         #ttid = filmid
 
         #ttid -> set(nmid)
-        self._tt_graph = defaultdict(set)
+        self._tt_graph = dict()
 
         #nmid -> set(ttid)
         self._nm_graph = defaultdict(set)
@@ -19,23 +19,22 @@ class Graph:
         #ttid -> tuple(tittel, rating)
         self._film_info = dict()
 
-    def legg_til_kanter_nm(self, key: str, name: str, tt_ids: set):
+    def legg_til_kanter_nm(self, key: str, name: str, tt_ids: set[str]):
         known = lambda x: x in self._tt_graph
         self._nm_graph[key] = self._nm_graph[key].union(filter(known, tt_ids))
         for tt_id in filter(known, tt_ids):
             self._tt_graph[tt_id].add(key)
         self._names[key] = name
 
-
-    def legg_til_filmer(self, key, tittel, rating):
-        self._tt_graph[key]
-        self._film_info[key] = (tittel, float(rating))
+    def legg_til_filmer(self, key: str, tittel: str, rating: float):
+        self._tt_graph[key] = set()
+        self._film_info[key] = (tittel, rating)
 
     def antall_noder(self):
         return len(self._nm_graph)
 
     def antall_kanter(self):
-        return sum(map(lambda x: (n := len(x))*(n-1)/2, self._tt_graph.values()))
+        return int(sum(map(lambda x: len(x)*(len(x)-1)/2, self._tt_graph.values())))
 
 
     def komponenter(self):
@@ -48,11 +47,11 @@ class Graph:
             while queue:
                 skuespiller = queue.pop()
                 for film in self._nm_graph[skuespiller]:
-                    for skuespiller in self._tt_graph[film]:
-                        if skuespiller in not_visitet:
+                    for nabo in self._tt_graph[film]:
+                        if nabo in not_visitet:
                             count += 1
-                            not_visitet.remove(skuespiller)
-                            queue.add(skuespiller)
+                            not_visitet.discard(nabo)
+                            queue.add(nabo)
             results[count] += 1
         return results
 
@@ -69,22 +68,25 @@ if __name__ == "__main__":
     graph = Graph()
     with open("movies.tsv", "r", encoding="UTF-8") as movies:
         for line in movies:
-            line_split = line.split("\t")
-            graph.legg_til_filmer(line_split[0], line_split[1], line_split[2])
+            line_split = line.strip().split("\t")
+            graph.legg_til_filmer(line_split[0], line_split[1], float(line_split[2]))
 
 
     with open("actors.tsv", "r", encoding="UTF-8") as actors:
         for line in actors:
-            line_split = line.split("\t")
+            line_split = line.strip().split("\t")
             graph.legg_til_kanter_nm(line_split[0], line_split[1], set(line_split[2:]))
 
-    print(graph.antall_noder())
-    print(graph.antall_kanter())
+    print(f"Nodes: {graph.antall_noder()}")
+    print(f"Edges: {graph.antall_kanter()}")
 
     result = graph.komponenter()
 
     for key in result:
         print(f"There are {result[key]} components of size {key}")
 
-
+    summ = 0
+    for key in result:
+        summ  += key*result[key]
+    print(summ)
 
